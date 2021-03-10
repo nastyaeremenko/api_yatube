@@ -1,6 +1,7 @@
 import django_filters.rest_framework
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from rest_framework import mixins
 from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
@@ -45,7 +46,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(**save_params)
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(mixins.CreateModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = [IsAuthenticated]
@@ -53,7 +56,7 @@ class FollowViewSet(viewsets.ModelViewSet):
     search_fields = ['=user__username', '=following__username']
 
     def get_queryset(self):
-        following = get_object_or_404(User, username=self.request.user)
+        following = self.request.user
         return Follow.objects.filter(following=following)
 
     def perform_create(self, serializer):
@@ -63,7 +66,4 @@ class FollowViewSet(viewsets.ModelViewSet):
 class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    permission_classes = PERMISSION_CLASSES
-
-    def perform_create(self, serializer):
-        serializer.save()
+    permission_classes = [IsAuthenticatedOrReadOnly, ]
