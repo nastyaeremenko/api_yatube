@@ -16,7 +16,7 @@ PERMISSION_CLASSES = [IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 User = get_user_model()
 
 
-class baseModelClasses(mixins.CreateModelMixin,
+class BaseModelClasses(mixins.CreateModelMixin,
                        mixins.ListModelMixin,
                        viewsets.GenericViewSet):
     pass
@@ -52,7 +52,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(**save_params)
 
 
-class FollowViewSet(baseModelClasses):
+class FollowViewSet(BaseModelClasses):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = [IsAuthenticated]
@@ -67,7 +67,7 @@ class FollowViewSet(baseModelClasses):
         serializer.save(user=self.request.user)
 
 
-class GroupViewSet(baseModelClasses):
+class GroupViewSet(BaseModelClasses):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, ]
